@@ -1,8 +1,7 @@
 from datetime import date, timedelta
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Sum
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -25,7 +24,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     queryset = Product.objects.all().order_by('-created_at')
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -34,7 +33,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
     """
     queryset = Customer.objects.all().order_by('-created_at')
     serializer_class = CustomerSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -42,7 +41,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     CRUD API for Orders, with different serializers for read/write.
     """
     queryset = Order.objects.all().order_by('-order_date')
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -56,7 +55,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     """
     queryset = Expense.objects.all().order_by('-date')
     serializer_class = ExpenseSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 # ============================
@@ -74,7 +73,7 @@ class SalesSummaryView(APIView):
     - total_orders
     - total_customers
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         today = date.today()
@@ -103,14 +102,15 @@ class SalesSummaryView(APIView):
         total_profit = total_revenue - total_expense
 
         data = {
-            "today_sales": today_sales,
-            "month_sales": month_sales,
-            "total_revenue": total_revenue,
-            "total_expense": total_expense,
-            "total_profit": total_profit,
+            "today_sales": float(today_sales),
+            "month_sales": float(month_sales),
+            "total_revenue": float(total_revenue),
+            "total_expense": float(total_expense),
+            "total_profit": float(total_profit),
             "total_orders": orders.count(),
             "total_customers": Customer.objects.count(),
         }
+
         return Response(data)
 
 
@@ -123,7 +123,7 @@ class MonthlySalesView(APIView):
       {"month": "2025-02", "total_sales": 9876.00}
     ]
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         today = date.today()
@@ -139,7 +139,7 @@ class MonthlySalesView(APIView):
             monthly_totals[key] += order.total_amount or 0
 
         result = [
-            {"month": month, "total_sales": total}
+            {"month": month, "total_sales": float(total)}
             for month, total in sorted(monthly_totals.items())
         ]
         return Response(result)
@@ -150,7 +150,7 @@ class TopProductsView(APIView):
     Top N products by quantity sold.
     Query param: ?limit=5 (default 5)
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         top_n = int(request.query_params.get("limit", 5))
@@ -168,7 +168,7 @@ class TopProductsView(APIView):
                 "name": p.name,
                 "sku": p.sku,
                 "category": p.category,
-                "total_quantity": p.total_quantity,
+                "total_quantity": int(p.total_quantity or 0),
             }
             for p in products
         ]
@@ -182,7 +182,7 @@ class ExpensesSummaryView(APIView):
       ?start=YYYY-MM-DD
       ?end=YYYY-MM-DD
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         start_str = request.query_params.get("start")
