@@ -11,6 +11,7 @@ export default function OrdersPage() {
   const [selected, setSelected] = useState(null);
   const { push } = useToasts();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
   const load = async () => {

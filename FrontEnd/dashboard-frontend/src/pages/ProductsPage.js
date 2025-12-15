@@ -9,6 +9,7 @@ export default function ProductsPage() {
   const [form, setForm] = useState({ name: "", sku: "", category: "", buy_price: "", sell_price: "", stock: 0 });
   const { push } = useToasts();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
   const load = async () => {
