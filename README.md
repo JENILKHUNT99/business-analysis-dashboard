@@ -21,7 +21,6 @@ and real-world data modeling for inventory, orders, expenses, and analytics.
   - Monthly sales
   - Top-selling products
 - Clean REST API design using ModelViewSets
-- Ready for deployment (Gunicorn + Procfile)
 
 ### Frontend (React)
 - Login & protected routes
@@ -29,7 +28,6 @@ and real-world data modeling for inventory, orders, expenses, and analytics.
 - Products, Orders, Expenses pages
 - Order creation with multiple items
 - Toast notifications & modals
-- Light / Dark mode UI
 - Responsive design
 
 ---
